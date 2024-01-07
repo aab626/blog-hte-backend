@@ -6,6 +6,9 @@ from flask_cors import CORS
 app = Flask(__name__)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/blog-hte'
 
+# Allow communication between servers
+CORS(app)
+
 # DB connection
 mongo = PyMongo(app)
 db = mongo.db.posts
