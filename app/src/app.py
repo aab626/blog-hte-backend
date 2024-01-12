@@ -27,7 +27,7 @@ def createPost():
         'timestamp': request.json['timestamp']
     })
 
-    return jsonify(str(result.inserted_id))
+    return jsonify({'result': result.acknowledged})
 
 # Get list of posts
 @app.route('/posts', methods=['GET'])
@@ -38,10 +38,12 @@ def getPosts():
 
     return jsonify(posts)
 
-# # Get single post
-# @app.route('/post/<id>', methods=['GET'])
-# def getPost(id):
-#     return 'placeholder'
+# Get single post
+@app.route('/posts/<id>', methods=['GET'])
+def getPost(id):
+    post = db.find_one({'_id': ObjectId(id)})
+    post['_id'] = str(post['_id'])
+    return jsonify(post)
 
 # Delete single post
 @app.route('/posts/<id>', methods=['DELETE'])
@@ -50,23 +52,24 @@ def deletePost(id):
     return jsonify({'result': result.acknowledged})
 
 # # Update (edit) single post
-# @app.route('/users/<id>', methods=['PUT'])
-# def updatePost(id):
-#     result = db.update_one(
-#         {
-#             '_id': str(ObjectId(id))
-#         },
-#         {
-#             'name': request.json['title'],
-#             'body': request.json['body'],
-#             'author': request.json['author']
-#         }
-#     )
+@app.route('/posts/<id>', methods=['PUT'])
+def updatePost(id):
+    print(id);
+    print(request.json);
+    result = db.update_one(
+        {
+            '_id': ObjectId(id)
+        },
+        {
+            '$set': {
+                'title': request.json['title'],
+                'body': request.json['body'],
+                'author': request.json['author']
+            }
+        }
+    )
     
-#     return jsonify({'result': result.acknowledged})
-
-
-
+    return jsonify({'result': result.acknowledged})
 
 
 if __name__ == '__main__':
