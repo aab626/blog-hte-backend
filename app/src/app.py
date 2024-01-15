@@ -24,7 +24,8 @@ def createPost():
         'title': request.json['title'],
         'body': request.json['body'],
         'author': request.json['author'],
-        'timestamp': request.json['timestamp']
+        'timestamp': request.json['timestamp'],
+        'edited': False
     })
 
     return jsonify({'result': result.acknowledged})
@@ -51,7 +52,7 @@ def deletePost(id):
     result = db.delete_one({'_id': ObjectId(id)})
     return jsonify({'result': result.acknowledged})
 
-# # Update (edit) single post
+# Update (edit) single post
 @app.route('/posts/<id>', methods=['PUT'])
 def updatePost(id):
     print(id);
@@ -64,13 +65,20 @@ def updatePost(id):
             '$set': {
                 'title': request.json['title'],
                 'body': request.json['body'],
-                'author': request.json['author']
+                'author': request.json['author'],
+                'edited': True
             }
         }
     )
     
     return jsonify({'result': result.acknowledged})
 
+# # Check admin login (too lazy to add a new db)
+# @app.route('/login', methods=['PUT'])
+# def checkAdminLogin():
+#     print(request.json)
+#     return jsonify({'result': 'dummy'})
+
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='192.168.0.100', debug=True)
