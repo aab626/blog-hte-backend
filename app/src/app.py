@@ -3,6 +3,9 @@ from flask_pymongo import PyMongo
 from flask_cors import CORS
 from bson import ObjectId
 
+# Admin password
+ADMIN_PASSWORD = 'miau123'
+
 # Init Flask
 app = Flask(__name__)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/blog-hte'
@@ -73,12 +76,13 @@ def updatePost(id):
     
     return jsonify({'result': result.acknowledged})
 
-# # Check admin login (too lazy to add a new db)
-# @app.route('/login', methods=['PUT'])
-# def checkAdminLogin():
-#     print(request.json)
-#     return jsonify({'result': 'dummy'})
+# Check admin login (too lazy to add a new db)
+@app.route('/login', methods=['POST'])
+def checkAdminLogin():
+    result = request.json['password'] == ADMIN_PASSWORD
+    return jsonify({'result': result})
 
 
+# Run app
 if __name__ == '__main__':
     app.run(host='192.168.0.100', debug=True)
