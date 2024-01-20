@@ -23,12 +23,23 @@ print(db)
 # Create post
 @app.route('/posts', methods=['POST'])
 def createPost():
+    # Retrieve max post id
+    result = db.aggregate([
+        {"$sort": {"id": -1}},
+        {"$limit": 1},
+        {"$project": {"_id": 0, "id": 1}}
+        ])
+    
+    result_document = next(result, None)
+    max_id = result_document['id']
+
     result = db.insert_one({
         'title': request.json['title'],
         'body': request.json['body'],
         'author': request.json['author'],
         'timestamp': request.json['timestamp'],
-        'edited': False
+        'edited': False,
+        'id': max_id + 1
     })
 
     return jsonify({'result': result.acknowledged})
@@ -36,11 +47,11 @@ def createPost():
 # Get list of posts
 @app.route('/posts', methods=['GET'])
 def getPosts():
-    posts = list(db.find({}))
+    posts = list(db.find({}).sort('id', -1))
     for i in range(len(posts)):
         posts[i]['_id'] = str(posts[i]['_id'])
 
-    return jsonify(posts)
+    return jsonify(posts) 
 
 # Get single post
 @app.route('/posts/<id>', methods=['GET'])
